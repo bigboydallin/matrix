@@ -46,8 +46,13 @@ def parse(userInput):
         return Command("exit")
     assign = strippedInput.split("=")
     if len(assign) == 2:
-        value = parse(assign[1].replace(" ", "", 1))
+        value = parse(assign[1])
         return Command("assign", assign[0].replace(" ", ""), value)
+    mult = strippedInput.split(" x ")
+    if len(mult) == 2 and " x " in strippedInput:
+        m1 = parse(mult[0])
+        m2 = parse(mult[1])
+        return Command("mMult", m1, m2)
     if strippedInput.startswith("transpose"):
         term = parse(strippedInput.split(" ", 1)[1])
         return Command("trans", term)
@@ -74,6 +79,12 @@ def execute(command):
         sys.exit()
     if command.type == "assign":
         objects[command.term1] = execute(command.term2)
+    if command.type == "mMult":
+        m1 = execute(command.term1)
+        m2 = execute(command.term2)
+        result = m1.matrixMultply(m2)
+        print(result)
+        return result
     if command.type == "matrix":
         matrix = Matrix(int(command.term1), int(command.term2))
         print(
